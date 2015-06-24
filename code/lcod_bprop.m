@@ -6,8 +6,8 @@ function [ dWe, dS, dtheta, dX ] = lcod_bprop( X, Zstar, Z, We, S, theta, e, k, 
 %  e,k,b,B result of lcod_fprop
 % Output:
 %   dWe, dS, dtheta, dX, Z
-  dS=0;
-  dZ=0;
+  dS=zeros(size(S));
+  dZ=zeros(size(Z));
   dB=h_prime(B,theta)*(Z-Zstar);
   dtheta=zeros(size(theta));
   for t=T-1:-1:1
@@ -16,6 +16,7 @@ function [ dWe, dS, dtheta, dX ] = lcod_bprop( X, Zstar, Z, We, S, theta, e, k, 
     dB(k1)=dB(k1)+h_prime(b(t),theta(k1))*(dZ(k1)+de);
     dtheta(k1)=dtheta(k1)-sign(b(t))*h_prime(b(t),theta(k1))*(dZ(k1)+de);
     dZ(k)=-de;
+%     sum(dS(:))
   end
   dWe=dB*X';
   dX=We'*dB;

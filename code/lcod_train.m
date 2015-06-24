@@ -1,4 +1,4 @@
-function network = train_lcod( X, W, Zstar, alpha, T, num_iter )
+function network = lcod_train( X, W, Zstar, alpha, T, num_iter )
 %TRAIN Summary of this function goes here
 % X: training input signal nxm (m input of size n)
 % W: dictionary nxk (k basis vector size n)
@@ -19,13 +19,18 @@ function network = train_lcod( X, W, Zstar, alpha, T, num_iter )
   theta=alpha*ones(size(Zstar,1),1);
   for j=1:num_iter
     disp(strcat({'Iteration '},num2str(j)));
-    [Z,k,b,e,B]=lcod_fprop(X(:,mod(j,P)),We,S,theta,T);
-    [dWe,dS,dtheta,dX]=lcod_bprop(X(:,mod(j,P)),Zstar(:,mod(j,P)),Z,We,S,theta,e,k,b,B,T);
+    [Z,k,b,e,B]=lcod_fprop(X(:,mod(j-1,P)+1),We,S,theta,T);
+    [dWe,dS,dtheta,dX]=lcod_bprop(X(:,mod(j-1,P)+1),Zstar(:,mod(j-1,P)+1),Z,We,S,theta,e,k,b,B,T);
     We=We-1/j*dWe;
     S=S-1/j*dS;
     theta=theta-1/j*dtheta;
+%     sum(dWe(:))
+%     sum(dS(:))
+%     sum(dtheta(:))
   end
   network.We=We;
   network.S=S;
   network.theta=theta;
+  network.T=T;
+  network.num_iter=num_iter;
 end
