@@ -1,16 +1,22 @@
-function [ dWe, dS, dtheta, dX ] = lcod_bprop( Zstar, X, Z, We, S, theta, e, k, b, B )
+function [ dWe, dS, dtheta, dX ] = lcod_bprop( X, Zstar, Z, We, S, theta, e, k, b, B, T )
 %LCOD_BPROP Summary of this function goes here
+% d<something> mean derivative of L with respect to <something>
+% Input:
+%  lcod_bprop( X, Zstar, Z, We, S, theta, e, k, b, B, T )
 %  e,k,b,B result of lcod_fprop
+% Output:
+%   dWe, dS, dtheta, dX, Z
   dS=0;
-  deltaZ=0;
-  deltaB=h_prime(B,theta)*(Z-Zstar);
+  dZ=0;
+  dB=h_prime(B,theta)*(Z-Zstar);
+  dtheta=zeros(size(theta));
   for t=T-1:-1:1
-    k1=k(t); de=sum(deltaB.*S(:,k1));
-    dS(:,k1)=dS(:,k1)+deltaB*e(t);
-    deltaB(k1)=deltaB(k1)+h_prime(b(t),theta(k1))*(deltaZ(k1)+de);
-    dtheta(k1)=dtheta(k1)-sign(b(t))*h_prime(b(t),theta(k1))*(deltaZ(k1)+de);
-    deltaZ(k)=-de;
+    k1=k(t); de=sum(dB.*S(:,k1));
+    dS(:,k1)=dS(:,k1)+dB*e(t);
+    dB(k1)=dB(k1)+h_prime(b(t),theta(k1))*(dZ(k1)+de);
+    dtheta(k1)=dtheta(k1)-sign(b(t))*h_prime(b(t),theta(k1))*(dZ(k1)+de);
+    dZ(k)=-de;
   end
-  dWe=deltaB*X';
-  dX=We'*deltaB;
+  dWe=dB*X';
+  dX=We'*dB;
 end
