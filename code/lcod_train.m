@@ -12,6 +12,8 @@ function network = lcod_train( X, W, Zstar, alpha, T, num_iter )
   disp(strcat({'Alpha is '}, num2str(alpha)));
   disp(strcat({'Network depth is '}, num2str(T)));
   disp(strcat({'Num_iter is '}, num2str(num_iter)));
+  %W=W./repmat(sum(W,1),size(W,1),1); %normalize W, but when you normalize
+  %yourself the code change so this line is useless
   We=W';
   L=max(eig(W'*W))+0.1;
   S=eye(size(W'*W))-1/L*(W'*W);
@@ -24,13 +26,14 @@ function network = lcod_train( X, W, Zstar, alpha, T, num_iter )
     We=We-1/j*dWe;
     S=S-1/j*dS;
     theta=theta-1/j*dtheta;
-%     sum(dWe(:))
-%     sum(dS(:))
-%     sum(dtheta(:))
+    sum(dWe(:))
+    sum(dS(:))
+    sum(dtheta(:))
   end
   network.We=We;
   network.S=S;
   network.theta=theta;
   network.T=T;
   network.num_iter=num_iter;
+  disp('Finished');
 end
