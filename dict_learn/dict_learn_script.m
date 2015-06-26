@@ -1,8 +1,8 @@
 datapath='USPS data/';
 train_data=load([datapath 'USPS_Train_Data.mat']);
 train_data=train_data.Train_Data;
-COEFF_SIZE=size(train_data,1);
-ALPHA=0.05;
+COEFF_SIZE=size(train_data,1)*4;
+ALPHA=0.001;
 CONV_THRES=0.0001;
 Wd=dict_learn(train_data, ALPHA, COEFF_SIZE, CONV_THRES);
 dict.Wd=Wd;

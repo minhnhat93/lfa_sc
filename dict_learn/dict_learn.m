@@ -17,11 +17,13 @@ function Wd = dict_learn( X, alpha, coeff_size, conv_thres )
         dEWd(u,v)=(sum(Wd(u,:).*Zstar(:)')-X(u,t))*Zstar(v);
       end
     end
-    Wd_diff=1/iter*dEWd;
+    Wd_diff=dEWd/iter;
     Wd=col_norm(Wd-Wd_diff,2);
     %%
     disp(['Iteration ' num2str(iter,'%d') ': ']);
-    disp(max(abs(Wd_diff(:))));
+    k=abs(Wd_diff(:))==max(abs(Wd_diff(:)));
+    %disp(num2str(max(abs(Wd_diff(:))),'%.5f'));
+    disp(num2str(Wd_diff(k),'%.5f'));
   end
   disp('Finished');
 end

@@ -1,7 +1,9 @@
-function Wd = col_norm( Wd, norm_mode )
+function [Wd, w] = col_norm( Wd, norm_mode )
 %COL_NORM Summary of this function goes here
-%Wd = col_norm( Wd, norm_mode )
+%[Wd, w] = col_norm( Wd, norm_mode )
+  w=zeros(size(Wd,2),1);
   for j=1:size(Wd,2)
-    Wd(:,j)=Wd(:,j)/norm(Wd(:,j),norm_mode);
+    w(j)=norm(Wd(:,j),norm_mode);
+    Wd(:,j)=Wd(:,j)/w(j);
   end
 end

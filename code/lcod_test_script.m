@@ -6,7 +6,7 @@ dict=load([datapath 'Dictionary2.mat']);
 dict=dict.Dict;
 base_sp_code=zeros(size(dict,2),size(test_data,2));
 sp_code=zeros(size(base_sp_code));
-for j=1:size(sp_code,2)
+for j=1:10
   tic;
   base_sp_code(:,j)=cod(test_data(:,j),dict, 0.5, 0.0001);
   toc;

@@ -1,10 +1,11 @@
 function Z = cod(X, Wd, alpha, thres)
 %COD Summary of this function goes here
 %   Z = cod(X, Wd, alpha, thres)
-  S=eye(size(Wd'*Wd))-Wd'*Wd;
+  Wd=col_norm(Wd,2);
+  S=eye(size(Wd'*Wd))-(Wd'*Wd);
   B=Wd'*X;
   Z=zeros(size(B));
-  Zd=Inf*ones(size(Z));
+  Zd=Inf;
   while any(abs(Zd(:))>=thres)
     Z1=h_theta(B,alpha);
     Zd=Z1-Z;
