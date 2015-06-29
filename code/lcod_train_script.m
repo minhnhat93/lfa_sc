@@ -1,12 +1,10 @@
 n_sample=100;
-n_train_time=3;
-datapath='USPS data/';
+datapath='USPS Data/';
 train_data=load([datapath 'USPS_Train_Data.mat']);
 n_sample=min(n_sample,size(train_data.Train_Data,2));
 train_data=train_data.Train_Data(:,1:n_sample);
-sp_code=load([datapath 'Sparse_Coef2.mat']);
-sp_code=sp_code.Train_Set_sparse_vector;
-dict=load([datapath 'Dictionary2.mat']);
-dict=dict.Dict;
-network=lcod_train(train_data,dict,sp_code,0.5,7,n_sample*n_train_time);
+sp_code=load('USPS Data/Sparse_Coef2.mat'); sp_code=sp_code.Train_Set_sparse_vector;
+dict=load('USPS Data/Dictionary2.mat'); dict=dict.Dict;
+network=lcod_train(train_data,dict,sp_code,0.5,3,0.001,3);
+disp('Saving.');
 save('trained_network/lcod_network.mat');

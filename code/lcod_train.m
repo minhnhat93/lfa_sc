@@ -1,4 +1,4 @@
-function network = lcod_train( X, W, Zstar, alpha, T, num_iter )
+function network = lcod_train( X, Wd, Zstar, alpha, T, conv_thres, conv_count_thres )
 %TRAIN Summary of this function goes here
 % X: training input signal nxm (m input of size n)
 % W: dictionary nxk (k basis vector size n)
@@ -11,29 +11,46 @@ function network = lcod_train( X, W, Zstar, alpha, T, num_iter )
   %initialize variables
   disp(strcat({'Alpha is '}, num2str(alpha)));
   disp(strcat({'Network depth is '}, num2str(T)));
-  disp(strcat({'Num_iter is '}, num2str(num_iter)));
-  %W=W./repmat(sum(W,1),size(W,1),1); %normalize W, but when you normalize
-  %yourself the code change so this line is useless
-  We=W';
-  L=max(eig(W'*W))+0.1;
-  S=eye(size(W'*W))-1/L*(W'*W);
+  disp(strcat({'Convergence threshold is '}, num2str(conv_thres)));
+  We=Wd';
+  L=max(eig(Wd'*Wd))+1;
+  S=eye(size(Wd'*Wd))-1/L*(Wd'*Wd);
   P=size(X,2);
   theta=alpha*ones(size(Zstar,1),1);
-  for j=1:num_iter
+  %for j=1:num_iter
+  dWe=Inf; dS=Inf; dtheta=Inf;
+  j=0;
+  conv_count=0;
+  while true
+    j=j+1;
+    idx=mod(j-1,P)+1;
+    conv_coef=1/j;
+    if any(conv_coef*[max(abs(dWe(:))); max(abs(dS(:))); max(abs(dtheta(:)))]>=conv_thres)
+      conv_count=0;
+    else
+      conv_count=conv_count+1;
+    end
+    if (conv_count==conv_count_thres)
+      break;
+    end
     disp(strcat({'Iteration '},num2str(j)));
-    [Z,k,b,e,B]=lcod_fprop(X(:,mod(j-1,P)+1),We,S,theta,T);
-    [dWe,dS,dtheta,dX]=lcod_bprop(X(:,mod(j-1,P)+1),Zstar(:,mod(j-1,P)+1),Z,We,S,theta,e,k,b,B,T);
-    We=We-1/j*dWe;
-    S=S-1/j*dS;
-    theta=theta-1/j*dtheta;
-    sum(dWe(:))
-    sum(dS(:))
-    sum(dtheta(:))
+    [Z,K,b,e,B]=lcod_fprop(X(:,idx),We,S,theta,T);
+    [dWe,dS,dtheta,dX]=lcod_bprop(X(:,idx),Zstar(:,idx),Z,We,S,theta,e,K,b,B,T);
+    if all(dWe(:)==0)||all(dS(:)==0)||all(dtheta(:)==0)
+      1;
+    end;
+    We=We-conv_coef*dWe; We=col_norm(We',2)';
+    S=S-conv_coef*dS;
+    theta=theta-conv_coef*dtheta;
+    max(abs(conv_coef*dWe(:)))
+    max(abs(conv_coef*dS(:)))
+    max(abs(conv_coef*dtheta(:)))
   end
   network.We=We;
   network.S=S;
   network.theta=theta;
+  network.alpha=alpha;
   network.T=T;
-  network.num_iter=num_iter;
+  network.conv_thres=conv_thres;
   disp('Finished');
 end
