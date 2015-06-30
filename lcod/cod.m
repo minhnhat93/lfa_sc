@@ -4,7 +4,7 @@ function [Z,num_iter] = cod(X, Wd, S, alpha, thres)
 % S is mutual inhibation matrix S=I-1/L*Wd'*Wd
 % L=largest eig value of Wd'*Wd + 0.1
 % Because S doesn't change across dataset, you should supply S yourself
-% If you want this programm to calculate S, put in S=0;
+% If you want this program to calculate S, put in S=0;
   Wd=col_norm(Wd,2);
   if all(S==0)
     %L=max(eig(Wd'*Wd))+0.1;

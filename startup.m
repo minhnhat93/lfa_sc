@@ -1,3 +1,3 @@
-addpath('code');
-addpath('dict_learn');
-addpath('my_sp_code');
+addpath('lcod');
+addpath('lista');
+addpath('shared_func');
