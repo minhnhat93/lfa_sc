@@ -6,10 +6,10 @@ Wd=Dict;
 coeff_trainset=zeros(size(Dict,2),size(train_data,2));
 [Wd,w]=col_norm(Wd,2);
 L=max(eig(Wd'*Wd))+0.1;
-S=eye(size(Wd'*Wd))-1/L*(Wd'*Wd);
+S=eye(size(Wd'*Wd))-(Wd'*Wd);
 for j=1:size(train_data,2)
   disp(j);
-  coeff_trainset(:,j)=cod(train_data(:,j),Wd, S, 0.01, 0.01);
+  coeff_trainset(:,j)=cod(train_data(:,j),Wd, S, 0.005, 0.00001);
 end
 save('normalized_data/coeff_train_2000.mat','coeff_trainset');
 %%
@@ -18,6 +18,6 @@ train_data=train_data.Test_Data;
 coeff_trainset=zeros(size(Dict,2),size(train_data,2));
 for j=1:size(train_data,2)
   disp(j);
-  coeff_trainset(:,j)=cod(train_data(:,j),Wd, S, 0.5, 0.001);
+  coeff_trainset(:,j)=cod(train_data(:,j),Wd, S, 0.005, 0.00001);
 end
 save('normalized_data/coeff_test_2000.mat','coeff_trainset');
