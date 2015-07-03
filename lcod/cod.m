@@ -1,7 +1,7 @@
 function [Z,num_iter] = cod(X, Wd, S, alpha, thres)
 %COD Summary of this function goes here
-%   Z = cod(X, Wd, alpha, thres)
-% S is mutual inhibation matrix S=I-1/L*Wd'*Wd
+%   Z = cod(X, Wd, S, alpha, thres)
+% S is mutual inhibation matrix S=I-Wd'*Wd
 % L=largest eig value of Wd'*Wd + 0.1
 % Because S doesn't change across dataset, you should supply S yourself
 % If you want this program to calculate S, put in S=0;

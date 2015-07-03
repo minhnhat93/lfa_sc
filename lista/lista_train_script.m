@@ -5,6 +5,6 @@ n_sample=min(n_sample,size(train_data.Train_Data,2));
 train_data=train_data.Train_Data(:,1:n_sample);
 sp_code=load('USPS Data/Sparse_Coef2.mat'); sp_code=sp_code.Train_Set_sparse_vector;
 dict=load('USPS Data/Dictionary2.mat'); dict=dict.Dict;
-network=lista_train(train_data,dict,sp_code,0.5,3,0.001,3);
+network=lista_train(train_data,dict,sp_code,0.005,3,0.0001,3);
 disp('Saving.');
 save('trained_network/lista_network.mat');

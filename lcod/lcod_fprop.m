@@ -20,10 +20,10 @@ function [Z, K, b, e, B] = lcod_fprop( X, We, S, theta, T )
     Z1=h_theta(B,theta);
     Zd=Z1-Z;
     k=find(abs((abs(Zd)-max(abs(Zd))))<eps, 1 );
-    K(t)=k; 
+    K(t)=k;
     b(t)=B(k); 
     e(t)=Z1(k)-Z(k);
-    B=B+S(:,k)*e(t);
+    B=B+S(:,k).*e(t); %B(k)=b(t);
     Z(k)=Z1(k);
     %plot(B); pause;
     %B(idx)

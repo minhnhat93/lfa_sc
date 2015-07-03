@@ -1,5 +1,5 @@
-function Z = lista( X, Wd, alpha, L, conv_thres )
-%LISTA Summary of this function goes here
+function Z = ista( X, Wd, alpha, L, conv_thres )
+% Z = lista( X, Wd, alpha, L, conv_thres )
 %   Detailed explanation goes here
   Z=zeros(size(Wd,2),1);
   Zd=Inf;
