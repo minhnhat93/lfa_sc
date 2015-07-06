@@ -1,4 +1,4 @@
-ALPHA=0.5;
+ALPHA=0.1;
 CONV_THRES=1e-4;
 datapath='USPS Data/';
 test_data=load([datapath 'USPS_Test_Data.mat']);
@@ -17,6 +17,7 @@ S=eye(size(Wd'*Wd))-(Wd'*Wd);
 %%
 for j=1:size(train_data,2)
   fprintf('%d\n',j);
+  base_sp_code(:,j)=cod(train_data(:,j),Wd,S,ALPHA,CONV_THRES,Inf);
   sp_cod(:,j)=cod(train_data(:,j),Wd,S,ALPHA,CONV_THRES,Inf);
   sp_ista(:,j)=ista(train_data(:,j),Wd,ALPHA,L,CONV_THRES);
   sp_cod_their(:,j)=coordlsl1(Wd,train_data(:,j),1/2/ALPHA);
@@ -51,4 +52,4 @@ result.cod_alt_MAE=mean(L1err3(:));
 result.cod_MSE=mean(L2err1(:));
 result.ista_MSE=mean(L2err2(:));
 result.cod_alt_MSE=mean(L2err3(:));
-save('result/result_0d5.mat','result');
+save('result/result_0d1.mat','result');
