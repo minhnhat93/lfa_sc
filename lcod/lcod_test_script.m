@@ -1,4 +1,5 @@
-load('trained_network/lcod_network.mat');
+append='_31';
+load(strcat('trained_network/lcod_network',append,'.mat'));
 datapath='USPS data/';
 test_data=load([datapath 'USPS_Test_Data.mat']);
 test_data=test_data.Test_Data;
@@ -9,11 +10,14 @@ Wd=Wd.Dict;
 base_sp_code=load('USPS Data/Sparse_Coef2.mat');
 base_sp_code=base_sp_code.Train_Set_sparse_vector;
 sp_code=zeros(size(base_sp_code));
+L=max(eig(Wd'*Wd))+1;
 S=eye(size(Wd'*Wd))-(Wd'*Wd);
+%%
 for j=1:200
   %[base_sp_code(:,j),num_iter]=cod(train_data(:,j),Wd, S, 0.5, 0.001);
   %sp_code(:,j)=lcod_fprop(test_data(:,j),Wd',S,0.0001,100);
-  base_sp_code=cod(test_data(:,j),Wd,S,0.005,0.001);
+  base_sp_code(:,j)=cod(test_data(:,j),Wd,S,0.005,0.001,Inf);
+  %sp_code(:,j)=cod(test_data(:,j),Wd,S,0.005,0.0001);
   sp_code(:,j)=lcod_fprop(test_data(:,j),network.We,network.S,network.theta,network.T);
   %%
   xp=Wd*sp_code(:,j);
@@ -24,10 +28,10 @@ for j=1:200
   %plot(train_data(:,j));
   %title('Input signal');
   subplot(3,2,3);
-  plot(base_sp_code);
+  plot(base_sp_code(:,j));
   title('Ground truth sparse code');
   subplot(3,2,4);
-  plot(Wd*base_sp_code);
+  plot(Wd*base_sp_code(:,j));
   title('Reconstructed signal');
   subplot(3,2,5);
   plot(sp_code(:,j));

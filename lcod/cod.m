@@ -1,4 +1,4 @@
-function [Z,num_iter] = cod(X, Wd, S, alpha, thres)
+function [Z,num_iter,Zout] = cod(X, Wd, S, alpha, thres, out_iter)
 %COD Summary of this function goes here
 %   Z = cod(X, Wd, S, alpha, thres)
 % S is mutual inhibation matrix S=I-Wd'*Wd
@@ -21,9 +21,9 @@ function [Z,num_iter] = cod(X, Wd, S, alpha, thres)
     k1=find(abs((abs(Zd)-max(abs(Zd))))<eps, 1 );
     B=B+S(:,k1)*(Z1(k1)-Z(k1));
     Z(k1)=Z1(k1);
-%     if (num_iter==200)
-%       figure,plot(Z1), figure, plot(Wd*Z1), pause;
-%     end
+    if (num_iter==out_iter)
+      Zout=Z1;
+    end
   end
   Z=h_theta(B,alpha);
 end
