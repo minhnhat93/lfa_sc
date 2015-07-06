@@ -1,5 +1,5 @@
-ALPHA=0.5;
-NET_DEPTH=21;
+ALPHA=0.1;
+NET_DEPTH=101;
 load(sprintf('trained_network/lcod_network_%f_%d.mat',ALPHA,NET_DEPTH));
 datapath='USPS Data/';
 test_data=load([datapath 'USPS_Test_Data.mat']);
@@ -13,8 +13,8 @@ sp_code=zeros(size(base_sp_code));
 L=max(eig(Wd'*Wd))+1;
 S=eye(size(Wd'*Wd))-(Wd'*Wd);
 %%
-bright_mul=4;
-plot_flag=false;
+bright_mul=8;
+plot_flag=true;
 for j=1:size(test_data,2)
   disp(j);
   [base_sp_code(:,j),num_iter]=cod(test_data(:,j),Wd,S,ALPHA,0.0001,Inf);
@@ -50,8 +50,8 @@ err=test_data-Wd*sp_code;
 L1err=zeros(1,size(err,2));
 L2err=zeros(1,size(err,2));
 for j=1:size(err,2)
-  L1err(j)=norm(err(:,j),1);
-  L2err(j)=norm(err(:,j),2);
+  L1err(j)=sum(abs(err(:,j)));
+  L2err(j)=sum(err(:,j).*err(:,j));
 end
 clear result;
 result.mean_absolute_error=mean(L1err);
