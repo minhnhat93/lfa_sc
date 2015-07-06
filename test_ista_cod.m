@@ -32,12 +32,13 @@ L2err1=zeros(1,size(err1,2));
 L2err2=zeros(1,size(err2,2));
 L2err3=zeros(1,size(err3,2));
 for j=1:size(train_data,2)
-  L1err1(j)=norm(err1,1);
-  L1err2(j)=norm(err2,1);
-  L1err3(j)=norm(err3,1);
-  L2err1(j)=norm(err1,2);
-  L2err2(j)=norm(err2,2);
-  L2err3(j)=norm(err3,2);
+  disp(j);
+  L1err1(j)=norm(err1(:,j),1);
+  L1err2(j)=norm(err2(:,j),1);
+  L1err3(j)=norm(err3(:,j),1);
+  L2err1(j)=norm(err1(:,j),2);
+  L2err2(j)=norm(err2(:,j),2);
+  L2err3(j)=norm(err3(:,j),2);
 end
 result.ALPHA=ALPHA;
 result.CONV_THRES=CONV_THRES;
@@ -50,4 +51,4 @@ result.cod_alt_MAE=mean(L1err3(:));
 result.cod_MSE=mean(L2err1(:));
 result.ista_MSE=mean(L2err2(:));
 result.cod_alt_MSE=mean(L2err3(:));
-save('result_0d5.mat','result');
+save('result/result_0d5.mat','result');
