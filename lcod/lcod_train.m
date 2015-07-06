@@ -1,4 +1,4 @@
-function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_rate, conv_thres, conv_count_thres )
+function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_rate, max_iter, conv_thres, conv_count_thres )
 %TRAIN Summary of this function goes here
 % X: training input signal nxm (m input of size n)
 % W: dictionary nxk (k basis vector size n)
@@ -26,7 +26,13 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
   %%
   sp=zeros(size(Zstar));
   LWm=zeros(size(X,2),1);
-  while true
+%   fprintf('Calculating base sparse code\n');
+%   tic;
+%   for i=1:size(X,2)
+%       Zstar(:,i)=cod(X(:,i),Wd,S,alpha,1e-4,Inf);
+%   end;
+%   toc;
+  while j<=max_iter
     j=j+1;
     idx=mod(j-1,P)+1;
     fprintf('Iteration %d:\n',j);
@@ -38,43 +44,47 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
     We=We-conv_coef*dWe; We=col_norm(We',2)';
     S=S-conv_coef*dS;
     theta=theta-conv_coef*dtheta;
+    %% 
+    %spp=lcod_fprop(X(:,idx),We,S,theta,T);
+    %xpp=Wd*spp;
+    if mod(j,10)==0
+      %tic;
+      Z=mass_lcod_fprop(X,We,S,theta,T);
+      %toc;
+      err=Zstar-Z;
+      %tic;
+      for i=1:size(X,2)
+        LWm(i)=norm(err(:,i),2)^2;
+      end
+      %toc;
+      LW=0.5*mean(LWm);
+      mdWe=max(abs(conv_coef*dWe(:)));
+      mdS=max(abs(conv_coef*dS(:)));
+      mdtheta=max(abs(conv_coef*dtheta(:)));
+      fprintf('dWe:    %e\n',mdWe);
+      fprintf('dS:     %e\n',mdS);
+      fprintf('dtheta: %e\n',mdtheta);
+      fprintf('L1(W):  %e\n',mean(sum(abs(err),2)));
+      fprintf('L(W):   %e\n',LW);
+      %%
+      if (abs(LW-LW1)/LW1>conv_thres||LW<LW1)
+        conv_count=0;
+      else
+        conv_count=conv_count+1;
+      end
+      if (conv_count==conv_count_thres)
+        break;
+      end
+      LW1=LW;
+    end
     %%
-    spp=lcod_fprop(X(:,idx),We,S,theta,T);
-    xpp=Wd*spp;
-    tic;
-    Z=mass_lcod_fprop(X,We,S,theta,T);
-    toc;
-    err=Zstar-Z;
-    tic;
-    for i=1:size(X,2)
-      LWm(i)=norm(err(:,i),2)^2;
-    end
-    toc;
-    LW=0.5*mean(LWm);
-    mdWe=max(abs(conv_coef*dWe(:)));
-    mdS=max(abs(conv_coef*dS(:)));
-    mdtheta=max(abs(conv_coef*dtheta(:)));
-    fprintf('dWe:    %e\n',conv_coef*mdWe);
-    fprintf('dS:     %e\n',conv_coef*mdS);
-    fprintf('dtheta: %e\n',conv_coef*mdtheta);
-    fprintf('L(W):   %e\n',LW);
-    if mod(j,display_iter)==0
-      subplot(2,2,1); plot(Zstar(:,idx));
-      subplot(2,2,2); plot(Wd*Zstar(:,idx));
-      subplot(2,2,3); plot(spp);
-      subplot(2,2,4); plot(xpp);
-      pause;
-    end
-    %%
-    if (LW>conv_thres||LW>LW1)
-      conv_count=0;
-    else
-      conv_count=conv_count+1;
-    end
-    if (conv_count==conv_count_thres)
-      break;
-    end
-    LW1=LW;
+%     if mod(j,display_iter)==0
+%       subplot(2,2,1); plot(Zstar(:,idx));
+%       subplot(2,2,2); plot(Wd*Zstar(:,idx));
+%       subplot(2,2,3); plot(spp);
+%       subplot(2,2,4); plot(xpp);
+%       pause;
+%     end
     fprintf('\n');
   end
   network.We=We;
