@@ -1,6 +1,6 @@
 DATASET='MNIST';
-ALPHA=0.1;
-NET_DEPTH=7;
+ALPHA=0.5;
+NET_DEPTH=1;
 if strcmp(DATASET,'USPS')
   load(sprintf('trained_network/USPS_lcod_network_%f_%d.mat',ALPHA,NET_DEPTH));
   Wd=load('USPS Data/Dictionary2.mat');

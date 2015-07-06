@@ -5,13 +5,13 @@ for j=numel(pos):-1:2
 end
 amount(1)=0;
 d=min(amount(2:end));
-train_data=load('MNIST Data/MNIST_Data.mat');
-train_data=train_data.tr_dat;
+data=load('MNIST Data/MNIST_Data.mat');
+data=data.tr_dat;
 Wd=load('MNIST Data/Simplified_MNIST_Dic.mat');
 Wd=Wd.WDict;
 sp_code=load('MNIST Data/Simplified_Sparse_Coef.mat');
 sp_code=sp_code.Train_Set_sparse_vector(:,1:n_sample);
-new_train_data=zeros(size(Wd,1),10*d);
+train_data=zeros(size(Wd,1),10*d);
 sp=zeros(size(Wd,2),10*d);
 idx=0;
 S=eye(size(Wd'*Wd))-(Wd'*Wd);
@@ -19,7 +19,7 @@ for i=1:d
   for j=1:10
     idx=idx+1;
     disp(idx);
-    new_train_data(:,idx)=train_data(:,pos(j)+i);
+    train_data(:,idx)=data(:,pos(j)+i);
     sp(:,idx)=sp_code(:,pos(j)+i);
   end
 end
