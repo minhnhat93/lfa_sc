@@ -1,5 +1,6 @@
-append='';
-load(strcat('trained_network/lcod_network',append,'.mat'));
+ALPHA=0.5;
+NET_DEPTH=21;
+load(sprintf('trained_network/lcod_network_%f_%d.mat',ALPHA,NET_DEPTH));
 datapath='USPS Data/';
 test_data=load([datapath 'USPS_Test_Data.mat']);
 test_data=test_data.Test_Data;
@@ -7,16 +8,16 @@ train_data=load([datapath 'USPS_Train_Data.mat']);
 train_data=train_data.Train_Data;
 Wd=load('USPS Data/Dictionary2.mat');
 Wd=Wd.Dict;
-base_sp_code=load('USPS Data/coef_2000_0dot5.mat');
-base_sp_code=base_sp_code.sp;
+base_sp_code=zeros(size(Wd,2),size(test_data,2));
 sp_code=zeros(size(base_sp_code));
 L=max(eig(Wd'*Wd))+1;
 S=eye(size(Wd'*Wd))-(Wd'*Wd);
 %%
 bright_mul=4;
-plot_flag=true;
-for j=1:200
-  [base_sp_code(:,j),num_iter]=cod(test_data(:,j),Wd,S,0.005,0.0001,Inf);
+plot_flag=false;
+for j=1:size(test_data,2)
+  disp(j);
+  [base_sp_code(:,j),num_iter]=cod(test_data(:,j),Wd,S,ALPHA,0.0001,Inf);
   sp_code(:,j)=lcod_fprop(test_data(:,j),network.We,network.S,network.theta,network.T);
   %%
   if plot_flag
@@ -45,12 +46,14 @@ for j=1:200
   end
 end
 %%
-err=base_sp_code-sp_code;
+err=test_data-Wd*sp_code;
 L1err=zeros(1,size(err,2));
-L2err=zeros(2,size(err,2));
+L2err=zeros(1,size(err,2));
 for j=1:size(err,2)
   L1err(j)=norm(err(:,j),1);
   L2err(j)=norm(err(:,j),2);
 end
+clear result;
 result.mean_absolute_error=mean(L1err);
 result.mean_squared_error=mean(L2err);
+save(sprintf('lcod_result/result_%f_%d.mat',ALPHA,NET_DEPTH),'result');
