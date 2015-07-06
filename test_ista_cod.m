@@ -1,6 +1,6 @@
 ALPHA=0.5;
 CONV_THRES=1e-4;
-datapath='USPS data/';
+datapath='USPS Data/';
 test_data=load([datapath 'USPS_Test_Data.mat']);
 test_data=test_data.Test_Data;
 train_data=load([datapath 'USPS_Train_Data.mat']);
