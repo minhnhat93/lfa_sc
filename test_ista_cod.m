@@ -42,9 +42,9 @@ for j=1:size(train_data,2)
 end
 result.ALPHA=ALPHA;
 result.CONV_THRES=CONV_THRES;
-result.cod_err=err1;
-result.ista_err=err2;
-result.cod_alt_err=err3;
+% result.cod_err=err1;
+% result.ista_err=err2;
+% result.cod_alt_err=err3;
 result.cod_MAE=mean(L1err1(:));
 result.ista_MAE=mean(L1err2(:));
 result.cod_alt_MAE=mean(L1err3(:));
