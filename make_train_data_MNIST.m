@@ -1,3 +1,4 @@
+ALPHA=0.5;
 pos=[0, 5293, 12665, 18623, 24754, 30596, 36017, 41935, 48200, 54051, 60000];
 p=pos;
 for j=numel(pos):-1:2
@@ -20,7 +21,11 @@ for i=1:d
     idx=idx+1;
     disp(idx);
     train_data(:,idx)=data(:,pos(j)+i);
-    sp(:,idx)=sp_code(:,pos(j)+i);
+    if ALPHA==0
+      sp(:,idx)=sp_code(:,pos(j)+i);
+    else
+      sp(:,idx)=cod(X,Wd,S,ALPHA,1e-6,Inf);
+    end
   end
 end
 save('MNIST Data/train_data.mat','train_data');

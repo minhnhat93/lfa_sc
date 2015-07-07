@@ -5,11 +5,6 @@ function [Z,num_iter,Zout] = cod(X, Wd, S, alpha, thres, out_iter)
 % L=largest eig value of Wd'*Wd + 0.1
 % Because S doesn't change across dataset, you should supply S yourself
 % If you want this program to calculate S, put in S=0;
-  Wd=col_norm(Wd,2);
-  if all(S==0)
-    %L=max(eig(Wd'*Wd))+0.1;
-    S=eye(size(Wd'*Wd))-(Wd'*Wd);
-  end
   B=Wd'*X;
   Z=zeros(size(B));
   Zd=Inf;
