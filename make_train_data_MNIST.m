@@ -11,7 +11,7 @@ data=data.tr_dat;
 Wd=load('MNIST Data/Simplified_MNIST_Dic.mat');
 Wd=Wd.WDict;
 sp_code=load('MNIST Data/Simplified_Sparse_Coef.mat');
-sp_code=sp_code.Train_Set_sparse_vector(:,1:n_sample);
+sp_code=sp_code.Train_Set_sparse_vector;
 train_data=zeros(size(Wd,1),10*d);
 sp=zeros(size(Wd,2),10*d);
 idx=0;
@@ -19,12 +19,12 @@ S=eye(size(Wd'*Wd))-(Wd'*Wd);
 for i=1:d
   for j=1:10
     idx=idx+1;
-    disp(idx);
+    fprintf('%d\n',idx);
     train_data(:,idx)=data(:,pos(j)+i);
     if ALPHA==0
       sp(:,idx)=sp_code(:,pos(j)+i);
     else
-      sp(:,idx)=cod(X,Wd,S,ALPHA,1e-6,Inf);
+      sp(:,idx)=cod(train_data(:,idx),Wd,S,ALPHA,1e-6,Inf);
     end
   end
 end

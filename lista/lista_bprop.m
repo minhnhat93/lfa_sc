@@ -1,4 +1,4 @@
-function [ dWe, dS, dtheta, dX ] = lista_bprop( Zstar, X, We, S, theta, Z, C, B, T)
+function [ dWe, dS, dtheta, dX ] = lista_bprop( X, Zstar, Z, We, S, theta, C, B, T)
 %LISTA_BPROP Summary of this function goes here
 % [ dWe, dS, dtheta, dX ] = lista_bprop( Zstar, X, We, S, theta, Z, C, B)
 %   Detailed explanation goes here
