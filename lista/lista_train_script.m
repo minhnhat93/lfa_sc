@@ -1,14 +1,15 @@
-DATASET='USPS';
+function lista_train_script(depth,t0)
+DATASET='MNIST';
 LEARNING_RATE.alpha=1;
-LEARNING_RATE.t0=99;
+LEARNING_RATE.t0=t0;
 LEARNING_RATE.max_change=0.1;
 MAX_ITER=100000;
 ALPHA=0.5;
-NET_DEPTH=3;
+NET_DEPTH=depth;
 NUM_CLASSES=1;
 CONV_THRES=1e-3;
-CONV_COUNT=1;
-ERROR_CHECK_ITER=5;
+CONV_COUNT=2;
+ERROR_CHECK_ITER=100;
 if strcmp(DATASET,'USPS')
   n_sample=Inf;
   train_data=load('USPS Data/train_data.mat');
@@ -34,3 +35,4 @@ network=lista_train(train_data,dict,sp_code,ALPHA,NET_DEPTH,NUM_CLASSES,...
 disp('Saving.');
 save(sprintf('trained_network/%s_lista_network_%f_%d.mat',DATASET,ALPHA,...
   NET_DEPTH),'network');
+end

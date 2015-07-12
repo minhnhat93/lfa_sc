@@ -40,7 +40,6 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
   while j<max_iter
     j=j+1;
     idx=mod(j-1,P)+1;
-    fprintf('Iteration %d:\n',j);
     [Z,K,b,e,B]=lcod_fprop(X(:,idx),network.We,network.S,network.theta,T);
     [dWe,dS,dtheta,dX]=lcod_bprop(X(:,idx),Zstar(:,idx),Z,network.We,network.S,network.theta,e,K,b,B,T);
     %%
@@ -51,6 +50,7 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
     network.theta=network.theta-conv_coef*dtheta;
     %%
     if mod(j,error_check_iter)==0
+      fprintf('Iteration %d:\n',j);
       %tic;
       Z=mass_lcod_fprop(X,network.We,network.S,network.theta,T);
       %toc;
@@ -75,7 +75,7 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
       if network.error<best_network.error
         best_network=network;
       end
-      if (abs(LW-LW1)/LW1>conv_thres||LW<LW1)
+      if (isinf(LW1)||abs(LW-LW1)/LW1>conv_thres)
         conv_count=0;
       else
         conv_count=conv_count+1;
@@ -93,7 +93,6 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
 %       subplot(2,2,4); plot(xpp);
 %       pause;
 %     end
-    fprintf('\n');
   end
   network=best_network;
   disp('Finished');
