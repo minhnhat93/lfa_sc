@@ -1,0 +1,13 @@
+load('GD/init_mat/USPS_y.mat');
+load('GD/init_mat/USPS_G.mat');
+COEFF_SIZE=2000;
+ALPHA=0.1;
+CONV_THRES=1e-2;
+CONV_COUNT=2;
+LR=struct('alpha',10,'t0',0);
+MAX_ITER=2000;
+Wd=dict_learn(y, G, ALPHA, COEFF_SIZE, LR, CONV_THRES, CONV_COUNT, MAX_ITER);
+dict.Wd=Wd;
+dict.alpha=ALPHA;
+dict.thres=CONV_THRES;
+save('GD/init_mat/USPS_Wd2.mat','Wd');

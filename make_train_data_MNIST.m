@@ -24,7 +24,7 @@ for i=1:d
     if ALPHA==0
       sp(:,idx)=sp_code(:,pos(j)+i);
     else
-      sp(:,idx)=cod(train_data(:,idx),Wd,S,ALPHA,1e-6,Inf);
+      sp(:,idx)=cod(train_data(:,idx),Wd,S,ALPHA,1e-6);
     end
   end
 end

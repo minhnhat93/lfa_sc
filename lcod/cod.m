@@ -6,7 +6,7 @@ function [Z,num_iter] = cod(X, Wd, S, alpha, thres)
   Z=zeros(size(B));
   Zd=Inf;
   num_iter=0;
-  while any(Zd(:)>thres)
+  while any(abs(Zd(:))>thres)
     num_iter=num_iter+1;
     Z1=h_theta(B,alpha);
     Zd=Z1-Z;

@@ -27,16 +27,16 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
   %%
   j=0;
   conv_count=0;
-  LW1=Inf;
   %%
-  sp=zeros(size(Zstar));
   LWm=zeros(size(X,2),1);
-%   fprintf('Calculating base sparse code\n');
-%   tic;
-%   for i=1:size(X,2)
-%       Zstar(:,i)=cod(X(:,i),Wd,S,alpha,1e-4,Inf);
-%   end;
-%   toc;
+  Z=mass_lcod_fprop(X,network.We,network.S,network.theta,T);
+  %toc;
+  err=Zstar-Z;
+  for i=1:size(X,2)
+    LWm(i)=norm(err(:,i),2)^2;
+  end
+  LW1=0.5*mean(LWm);
+  fprintf('Base error is %d\n',LW1);
   while j<max_iter
     j=j+1;
     idx=mod(j-1,P)+1;
@@ -45,21 +45,19 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
     %%
     conv_coef=1/(learning_rate.alpha*...
       (double((idivide(uint64(j-1),uint64(num_of_classes))+1)))+learning_rate.t0);
-    network.We=network.We-conv_coef*dWe; network.We=col_norm(network.We',2)';
+    network.We=network.We-conv_coef*dWe; %network.We=col_norm(network.We',2)';
     network.S=network.S-conv_coef*dS;
     network.theta=network.theta-conv_coef*dtheta;
     %%
-    if mod(j,error_check_iter)==0
+    if mod(j,error_check_iter)==min(1,error_check_iter-1) || j==max_iter
       fprintf('Iteration %d:\n',j);
       %tic;
       Z=mass_lcod_fprop(X,network.We,network.S,network.theta,T);
       %toc;
       err=Zstar-Z;
-      %tic;
       for i=1:size(X,2)
         LWm(i)=norm(err(:,i),2)^2;
       end
-      %toc;
       LW=0.5*mean(LWm);
       mdWe=max(abs(conv_coef*dWe(:)));
       mdS=max(abs(conv_coef*dS(:)));
@@ -67,7 +65,7 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
       fprintf('dWe:    %e\n',mdWe);
       fprintf('dS:     %e\n',mdS);
       fprintf('dtheta: %e\n',mdtheta);
-      fprintf('L1(W):  %e\n',mean(sum(abs(err))));
+      fprintf('L1(W):  %e\n',max(mean(abs(err),2)));
       fprintf('L(W):   %e\n',LW);
       fprintf('L Diff: %f %%\n',100*(LW-LW1)/LW1);
       network.error=LW;
@@ -94,6 +92,7 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
 %       pause;
 %     end
   end
+  if isinf(best_network.error); best_network=network; end;
   network=best_network;
   disp('Finished');
 end

@@ -1,4 +1,4 @@
-function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_rate, max_iter, conv_thres, conv_count_thres, error_check_iter )
+function network = lista_train( X, Zstar, network, num_of_classes, learning_rate, max_iter, conv_thres, conv_count_thres, error_check_iter )
 %TRAIN Summary of this function goes here
 % X: training input signal nxm (m input of size n)
 % W: dictionary nxk (k basis vector size n)
@@ -10,35 +10,36 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
 % Learning rate is n(j)=1/(learning_rate.alpha*(t+t0))
 % Ask Ms. Homa about the alpha value
   %initialize variables
-  display_iter=Inf;
-  disp(strcat({'Alpha is '}, num2str(alpha)));
-  disp(strcat({'Network depth is '}, num2str(T)));
-  disp(strcat({'Convergence threshold is '}, num2str(conv_thres)));
+  disp(strcat({'Alpha is '}, num2str(network.alpha)));
+  disp(strcat({'Network depth is '}, num2str(network.T)));
+  disp(strcat({'Convergence threshold is '}, num2str(network.conv_thres)));
   %%
-  network.alpha=alpha;
-  network.T=T;
-  network.conv_thres=conv_thres;
-  network.We=Wd';
-  L=max(eig(Wd'*Wd))+1;
-  network.S=eye(size(Wd'*Wd))-1/L*(Wd'*Wd);
-  network.error=Inf;
+  T=network.T;
+  conv_thres=network.conv_thres;
   best_network=network;
   P=size(X,2);
-  network.theta=alpha*ones(size(Zstar,1),1);
   %%
-  j=0;
   conv_count=0;
-  LW1=Inf;
   %%
-  sp=zeros(size(Zstar));
-  LWm=zeros(size(X,2),1);
-%   fprintf('Calculating base sparse code\n');
-%   tic;
-%   for i=1:size(X,2)
-%       Zstar(:,i)=cod(X(:,i),Wd,S,alpha,1e-4,Inf);
-%   end;
-%   toc;
+  if isinf(network.error)
+    LWm=zeros(size(X,2),1);
+    Z=mass_lista_fprop(X,network.We,network.S,network.theta,T);
+    err=Zstar-Z;
+    for i=1:size(X,2)
+      LWm(i)=norm(err(:,i),2)^2;
+    end
+    LW1=0.5*mean(LWm);
+    skip_first_error_check=false;
+    j=0;
+  else
+    LW1=network.error;
+    skip_first_error_check=true;
+    j=network.iter;
+  end
+  fprintf('Starting error is: %d\n',LW1);
+  VWe=0; VS=0; Vtheta=0;
   while j<max_iter
+    %fprintf('Iteration %d\n',j);
     j=j+1;
     idx=mod(j-1,P)+1;
     [~,Z,C,B]=lista_fprop(X(:,idx),network.We,network.S,network.theta,T);
@@ -46,11 +47,16 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
     %%
     conv_coef=1/(learning_rate.alpha*...
       (double((idivide(uint64(j-1),uint64(num_of_classes))+1)))+learning_rate.t0);
-    network.We=network.We-conv_coef*dWe; network.We=col_norm(network.We',2)';
-    network.S=network.S-conv_coef*dS;
-    network.theta=network.theta-conv_coef*dtheta;
+    VWe=learning_rate.momentum*VWe+conv_coef*dWe;
+    VS=learning_rate.momentum*VS+conv_coef*dS;
+    Vtheta=learning_rate.momentum*Vtheta+conv_coef*dtheta;
+    learning_rate.momentum=min(0.9,learning_rate.momentum+0.005);
+    network.We=network.We-VWe; %network.We=col_norm(network.We',2)';
+    network.S=network.S-VS;
+    network.theta=network.theta-Vtheta;
     %%
-    if mod(j,error_check_iter)==0 
+    if (mod(j,error_check_iter)==min([1;error_check_iter-1]) || j==max_iter)...
+       && ~skip_first_error_check
       fprintf('Iteration %d:\n',j);
       %tic;
       Z=mass_lista_fprop(X,network.We,network.S,network.theta,T);
@@ -62,21 +68,22 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
       end
       %toc;
       LW=0.5*mean(LWm);
-      mdWe=max(abs(conv_coef*dWe(:)));
-      mdS=max(abs(conv_coef*dS(:)));
-      mdtheta=max(abs(conv_coef*dtheta(:)));
+      mdWe=max(abs(VWe(:)));
+      mdS=max(abs(VS(:)));
+      mdtheta=max(abs(Vtheta(:)));
       fprintf('dWe:    %e\n',mdWe);
       fprintf('dS:     %e\n',mdS);
       fprintf('dtheta: %e\n',mdtheta);
-      fprintf('L1(W):  %e\n',mean(sum(abs(err))));
+      fprintf('L1(W):  %e\n',max(mean(abs(err),1)));
       fprintf('L(W):   %e\n',LW);
       fprintf('L Diff: %f %%\n',100*(LW-LW1)/LW1);
       network.error=LW;
       %%
       if network.error<best_network.error
         best_network=network;
+        best_network.iter=j;
       end
-      if (isinf(LW1)||abs(LW-LW1)/LW1>conv_thres)
+      if (abs(LW-LW1)/LW1>conv_thres)
         conv_count=0;
       else
         conv_count=conv_count+1;
@@ -86,15 +93,9 @@ function network = lcod_train( X, Wd, Zstar, alpha, T, num_of_classes, learning_
       end
       LW1=LW;
     end
-    %%
-%     if mod(j,display_iter)==0
-%       subplot(2,2,1); plot(Zstar(:,idx));
-%       subplot(2,2,2); plot(Wd*Zstar(:,idx));
-%       subplot(2,2,3); plot(spp);
-%       subplot(2,2,4); plot(xpp);
-%       pause;
-%     end
+    skip_first_error_check=false;
   end
+  if isinf(best_network.error); best_network=network; end;
   network=best_network;
   disp('Finished');
 end

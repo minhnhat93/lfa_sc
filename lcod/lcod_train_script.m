@@ -1,20 +1,20 @@
 function lcod_train_script(depth,t0)
-DATASET='MNIST';
+DATASET='USPS';
 LEARNING_RATE.alpha=1;
 LEARNING_RATE.t0=t0;
 LEARNING_RATE.max_change=0.1;
-MAX_ITER=100000;
+MAX_ITER=4000;
 ALPHA=0.5;
 NET_DEPTH=depth;
 NUM_CLASSES=1;
-CONV_THRES=1e-3;
-CONV_COUNT=2;
+CONV_THRES=1e-2;
+CONV_COUNT=Inf;
 ERROR_CHECK_ITER=100;
 if strcmp(DATASET,'USPS')
   n_sample=Inf;
   train_data=load('USPS Data/train_data.mat');
   train_data=train_data.train_data;
-  n_sample=min(n_sample,size(train_data.train_data,2));
+  n_sample=min(n_sample,size(train_data,2));
   train_data=train_data(:,1:n_sample);
   dict=load('USPS Data/Dictionary2.mat'); dict=dict.Dict;
   sp_code=load('USPS Data/coef_2000_0dot1.mat'); sp_code=sp_code.sp(:,...
