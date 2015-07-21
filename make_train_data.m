@@ -19,7 +19,7 @@ for i=1:d
     disp(idx);
     train_data(:,idx)=data(:,pos(j)+i);
     tic;
-    sp(:,idx)=cod(train_data(:,idx),Wd,S,ALPHA,1e-2);
+    sp(:,idx)=cod(train_data(:,idx),Wd,S,ALPHA,1e-5);
     toc;
   end
 end

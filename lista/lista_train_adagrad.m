@@ -31,13 +31,14 @@ function network = lista_train_adagrad( X, Zstar, network, num_of_classes, learn
     LW1=0.5*mean(LWm);
     skip_first_error_check=false;
     j=0;
+    G=0.1*ones(numel(network.We)+numel(network.S)+numel(network.theta),1);
   else
     LW1=network.error;
     skip_first_error_check=true;
     j=network.iter;
+    G=network.G;
   end
   fprintf('Starting error is: %d\n',LW1);
-  G=0.1*ones(numel(network.We)+numel(network.S)+numel(network.theta),1);
   while j<max_iter
     %fprintf('Iteration %d\n',j);
     j=j+1;
@@ -97,5 +98,6 @@ function network = lista_train_adagrad( X, Zstar, network, num_of_classes, learn
   end
   if isinf(best_network.error); best_network=network; end;
   network=best_network;
+  network.G=G;
   disp('Finished');
 end
